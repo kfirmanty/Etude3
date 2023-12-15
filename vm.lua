@@ -38,8 +38,19 @@ end
 local function jumpToRandomStep(vm)
     vm.step = randInt(#vm.steps)
 end
-possibleActions = {"i", "d", "a", "j"}
-local actions = {i = inc, d = dec, a = randomNote, j = jumpToRandomStep}
+
+local function faster(vm)
+    vm.ticksPerStep = vm.ticksPerStep - 1
+    if vm.ticksPerStep < 1 then vm.ticksPerStep = 1 end
+end
+
+local function slower(vm)
+    vm.ticksPerStep = vm.ticksPerStep + 1
+    if vm.ticksPerStep > 8 then vm.ticksPerStep = 8 end
+end
+
+possibleActions = {"i", "d", "a", "j", "f", "s"}
+local actions = {i = inc, d = dec, a = randomNote, j = jumpToRandomStep, f = faster, s = slower}
 local scales = {minorPentatonic = {0, 3, 5, 7, 10}}
 
 function vmToMidiNote(vm)
@@ -50,12 +61,29 @@ function vmToMidiNote(vm)
 end
 
 function vmTick(vm)
-    local action = vm.steps[vm.step + 1]
-    actions[action](vm)
-    vm.step = vm.step + 1
-    if vm.step >= #vm.steps then vm.step = 0 end
+    local hasAct = false
+    if vm.tick % vm.ticksPerStep == 0 then
+        hasAct = true
+        vm.tick = 0
+        local action = vm.steps[vm.step + 1]
+        actions[action](vm)
+        vm.step = vm.step + 1
+        if vm.step >= #vm.steps then vm.step = 0 end
+    end
+    vm.tick = vm.tick + 1
+    return hasAct
+end
+
+function randomSteps(num)
+    local steps = {}
+    for i = 1,num do
+        steps[i] = possibleActions[randInt(num)+1]
+    end
+    return steps
 end
 
 function vmInit(settings)
-    return {note = 0, step = 0, baseNote = settings.baseNote, steps = {"i", "i", "d", "a"}, scale = "minorPentatonic"}
+    return {note = 0, step = 0, baseNote = settings.baseNote, 
+    steps = randomSteps(4), 
+    scale = "minorPentatonic", ticksPerStep = 4, tick = 0}
 end

@@ -1,7 +1,7 @@
 local snd = playdate.sound
 
 function newsynth()
-	local s = snd.synth.new(snd.kWaveSawtooth)
+	local s = snd.synth.new(snd.kWaveTriangle)
 	s:setVolume(0.2)
 	s:setAttack(0)
 	s:setDecay(0.15)
