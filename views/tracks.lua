@@ -1,6 +1,4 @@
-import "CoreLibs/timer"
-import "audio"
-import "vm"
+import "../vm"
 
 TracksView = {}
 
@@ -38,18 +36,26 @@ function TracksView.downButtonDown(vms)
 	if selectedTrack > #vms then selectedTrack = 1 end
 end
 
+function TracksView.AButtonDown(vms)
+    currentView = "menu"
+end
+
+function TracksView.BButtonDown(vms) 
+end
+
 -- DRAW
 function TracksView.update(vms)
 	gfx.clear(gfx.kColorWhite)
 	gfx.setColor(gfx.kColorBlack)
+    playdate.graphics.drawText("TRACKS", 20, 10)
 	for vmI=1,#vms do
 		local vm = vms[vmI]
 		local text = ""
 		for i,v in ipairs(vm.steps) do
-			if i == vm.step + 1 then 
-				text = text .. "*" .. v .. "*   "
-			elseif i == editPosition and vmI == selectedTrack then
-				text = text .. "_" .. v .. "_   "
+            if i == editPosition and vmI == selectedTrack then
+                text = text .. "*" .. v .. "*   "
+            elseif i == vm.step + 1 then 
+                text = text .. "_" .. v .. "_   "
 			else
 				text = text .. v .. "   "
 			end

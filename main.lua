@@ -2,67 +2,63 @@ import "CoreLibs/timer"
 import "audio"
 import "vm"
 import "views/tracks"
+import "views/trackparams"
+import "views/menu"
 
 local gfx = playdate.graphics
-local synths = {druminst(), newinst(2), newinst(2), newinst(2), newinst(2)}
-local vms = {vmInit({baseNote = 36}), vmInit({baseNote = 36}), vmInit({baseNote = 36}), vmInit({baseNote = 36})}
+--local synths = {druminst(), newinst(2), newinst(2), newinst(2), newinst(2)}
+local vms = {vmInit({baseNote = 36, voice = newinst(2)}), 
+			 vmInit({baseNote = 36, voice = newinst(2)}), 
+			 vmInit({baseNote = 36, voice = newinst(2)}), 
+			 vmInit({baseNote = 36, voice = newinst(2)})}
 
 local tickMs = 150
 local keyTimer = nil
 
-local currentView = "tracks"
+currentView = "tracks"
 
 local function sequenceTick()
 	for i=1,#vms do
 		local vm = vms[i]
-		local hasAct = vmTick(vm)
-		if hasAct then
-			local midiNote = vmToMidiNote(vm)
-			synths[i+1]:playMIDINote(midiNote, 0.5, 0.1)
-		end
+		vmTick(vm)
 	end
 end
 keyTimer = playdate.timer.keyRepeatTimerWithDelay(tickMs, tickMs, sequenceTick)
 --    keyTimer:remove()
 
 -- INPUT
-function playdate.BButtonDown()
+local viewToImpl = {tracks = TracksView, 
+					menu = MenuView, 
+					params = TrackParamView}
 
+function playdate.BButtonDown()
+	viewToImpl[currentView]["BButtonDown"](vms)
 end
 
-function playdate.BButtonUp()
+function playdate.AButtonDown()
+	viewToImpl[currentView]["AButtonDown"](vms)
 end
 
 -- DPAD INPUT
 
 function playdate.leftButtonDown() 
-	if currentView == "tracks" then
-		TracksView.leftButtonDown(vms)
-	end
+	viewToImpl[currentView]["leftButtonDown"](vms)
 end
+
 function playdate.rightButtonDown()
-	if currentView == "tracks" then
-		TracksView.rightButtonDown(vms)
-	end
+	viewToImpl[currentView]["rightButtonDown"](vms)
 end
 
 function playdate.upButtonDown()
-	if currentView == "tracks" then
-		TracksView.upButtonDown(vms)
-	end
+	viewToImpl[currentView]["upButtonDown"](vms)
 end
 
 function playdate.downButtonDown() 
-	if currentView == "tracks" then
-		TracksView.downButtonDown(vms)
-	end
+	viewToImpl[currentView]["downButtonDown"](vms)
 end
 
 -- DRAW
-
 function playdate.update()
 	playdate.timer.updateTimers()
-	if currentView == "tracks" then
-		TracksView.update(vms)
-	end
+	viewToImpl[currentView]["update"](vms)
 end

@@ -1,3 +1,4 @@
+import "utils"
 -- i - increase note
 -- d = decrease note
 -- a = random note
@@ -16,6 +17,8 @@
 -- two modes = play on each tick, or use explicit play
 -- allow to set how many steps to execute at once
 
+possibleActions = {"i", "d", "a", "j", "f", "s"}
+
 local topScaleSteps = 10
 local function inc(vm)
     vm.note = vm.note + 1
@@ -25,10 +28,6 @@ end
 local function dec(vm)
     vm.note = vm.note - 1
     if vm.note < 0 then vm.note = 0 end
-end
-
-local function randInt(max)
-    return math.floor(math.random() * max)
 end
 
 local function randomNote(vm)
@@ -49,7 +48,6 @@ local function slower(vm)
     if vm.ticksPerStep > 8 then vm.ticksPerStep = 8 end
 end
 
-possibleActions = {"i", "d", "a", "j", "f", "s"}
 local actions = {i = inc, d = dec, a = randomNote, j = jumpToRandomStep, f = faster, s = slower}
 local scales = {minorPentatonic = {0, 3, 5, 7, 10}}
 
@@ -71,19 +69,27 @@ function vmTick(vm)
         if vm.step >= #vm.steps then vm.step = 0 end
     end
     vm.tick = vm.tick + 1
+    if hasAct then
+        vm.voice:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
+    end
     return hasAct
 end
 
-function randomSteps(num)
+function vmRandomStep()
+    return possibleActions[randInt(#possibleActions)+1]
+end
+
+local function randomSteps(num)
     local steps = {}
     for i = 1,num do
-        steps[i] = possibleActions[randInt(num)+1]
+        steps[i] = vmRandomStep()
     end
     return steps
 end
 
 function vmInit(settings)
-    return {note = 0, step = 0, baseNote = settings.baseNote, 
-    steps = randomSteps(4), 
-    scale = "minorPentatonic", ticksPerStep = 4, tick = 0}
+    return {note = 0, baseNote = settings.baseNote, 
+    step = 0, steps = randomSteps(4), 
+    scale = "minorPentatonic", ticksPerStep = 4, tick = 0,
+    voice = settings.voice}
 end
