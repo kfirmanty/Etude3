@@ -6,9 +6,8 @@ local gfx = playdate.graphics
 
 local editPosition = 1
 local selectedTrack = 1
-local editParamMode = false
 
-local options = {"base note", "steps", "volume"}
+local options = {"base note", "steps", "volume", "waveform"}
 
 local function optionToVmParamValue(vm, option)
     local value = nil
@@ -18,6 +17,8 @@ local function optionToVmParamValue(vm, option)
     value = #vm.steps
   elseif option == "volume" then
     value = vm.voice.volume
+  elseif option == "waveform" then
+    value = vm.voice.waveform
   end
   return value
 end
@@ -53,7 +54,7 @@ end
 
 function TrackParamView.upButtonDown(vms)
     local vm = vms[selectedTrack]
-    if editParamMode then
+    if playdate.buttonIsPressed(playdate.kButtonB) then
         editParamInc(vm, options[editPosition])
     else
         editPosition = editPosition - 1
@@ -63,7 +64,7 @@ end
 
 function TrackParamView.downButtonDown(vms)
     local vm = vms[selectedTrack]
-    if editParamMode then
+    if playdate.buttonIsPressed(playdate.kButtonB) then
         editParamDec(vm, options[editPosition])
     else
     editPosition = editPosition + 1
@@ -83,16 +84,12 @@ end
 function TrackParamView.update(vms)
 	gfx.clear(gfx.kColorWhite)
 	gfx.setColor(gfx.kColorBlack)
-    playdate.graphics.drawText("PARAMS", 20, 10)
+    playdate.graphics.drawText("PARAMS: " .. selectedTrack, 20, 10)
 	local vm = vms[selectedTrack]
 	for i,option in ipairs(options) do
         local text = option .. ": " .. optionToVmParamValue(vm, option)
         if i == editPosition then 
-            if editParamMode then 
-                text = "_" .. text .. "_" 
-		    else
-                text = "*" .. text .. "*"
-            end
+            text = "*" .. text .. "*"
         end
 
         playdate.graphics.drawText(text, 20, 20 + i * 40)

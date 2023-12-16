@@ -17,23 +17,41 @@ function TracksView.rightButtonDown(vms)
 	if editPosition > #vm.steps then editPosition = #vm.steps end
 end
 
-function TracksView.upButtonDown(vms)
-	local vm = vms[selectedTrack]
+local function currentActionIndex(vm)
 	local currentActionIndex = 1
-	local currentAction = vm.steps[editPosition]
-	for i,action in ipairs(possibleActions) do
-		if(action == currentAction) then
-			currentActionIndex = i
+		local currentAction = vm.steps[editPosition]
+		for i,action in ipairs(possibleActions) do
+			if(action == currentAction) then
+				currentActionIndex = i
+			end
 		end
-	end
-	currentActionIndex = currentActionIndex + 1
-	if currentActionIndex > #possibleActions then currentActionIndex = 1 end
-	vm.steps[editPosition] = possibleActions[currentActionIndex]
+	return currentActionIndex
 end
 
-function TracksView.downButtonDown(vms) 
-	selectedTrack = selectedTrack + 1
-	if selectedTrack > #vms then selectedTrack = 1 end
+function TracksView.upButtonDown(vms)
+	if playdate.buttonIsPressed(playdate.kButtonB) then
+		local vm = vms[selectedTrack]
+		local currentActionIndex = currentActionIndex(vm)
+		currentActionIndex = currentActionIndex + 1
+		if currentActionIndex > #possibleActions then currentActionIndex = 1 end
+		vm.steps[editPosition] = possibleActions[currentActionIndex]
+	else
+		selectedTrack = selectedTrack - 1
+		if selectedTrack < 1 then selectedTrack = #vms end
+	end
+end
+
+function TracksView.downButtonDown(vms)
+	if playdate.buttonIsPressed(playdate.kButtonB) then
+		local vm = vms[selectedTrack]
+		local currentActionIndex = currentActionIndex(vm)
+		currentActionIndex = currentActionIndex - 1
+		if currentActionIndex < 1 then currentActionIndex = #possibleActions end
+		vm.steps[editPosition] = possibleActions[currentActionIndex]
+	else
+		selectedTrack = selectedTrack + 1
+		if selectedTrack > #vms then selectedTrack = 1 end
+	end
 end
 
 function TracksView.AButtonDown(vms)
