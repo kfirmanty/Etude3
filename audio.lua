@@ -1,8 +1,27 @@
 local snd = playdate.sound
 
-function newsynth()
-	local s = snd.synth.new(snd.kWaveTriangle)
-	s:setVolume(0.2)
+local waveforms = {sine = snd.kWaveSine,
+square = snd.kWaveSquare,
+sawtooth = snd.kWaveSawtooth,
+triangle = snd.kWaveTriangle,
+noise = snd.kWaveNoise,
+phase = snd.kWavePOPhase,
+digital = snd.kWavePODigital,
+vosim = snd.kWavePOVosim}
+
+possibleWaveforms = {"sine", "square", "sawtooth", "triange", "noise", "phase", "digital", "vosim"}
+
+function synthChangeWaveform(synth, waveName)
+	synth:setWaveform(waveforms[waveName])
+end
+
+function synthChangeVolume(synth, volume)
+	synth:setVolume(volume)
+end
+
+function newsynth(settings)
+	local s = snd.synth.new(waveforms[settings.waveform])
+	s:setVolume(settings.volume)
 	s:setAttack(0)
 	s:setDecay(0.15)
 	s:setSustain(0.0)
@@ -17,11 +36,12 @@ function drumsynth(path, code)
 	return s
 end
 
-function newinst(n)
+function newinst(settings)
 	local inst = snd.instrument.new()
-	for i=1,n do
-		inst:addVoice(newsynth())
+	for i=1,settings.polyphony do
+		inst:addVoice(newsynth(settings))
 	end
+	inst:setVolume(settings.volume)
 	return inst
 end
 

@@ -8,7 +8,7 @@ local editPosition = 1
 local selectedTrack = 1
 local editParamMode = false
 
-local options = {"base note", "steps"}
+local options = {"base note", "steps", "volume"}
 
 local function optionToVmParamValue(vm, option)
     local value = nil
@@ -16,6 +16,8 @@ local function optionToVmParamValue(vm, option)
     value = vm.baseNote
   elseif option == "steps" then
     value = #vm.steps
+  elseif option == "volume" then
+    value = vm.voice.volume
   end
   return value
 end
@@ -24,7 +26,9 @@ local function editParamInc(vm, option)
     if option == "base note" then
         vm.baseNote = vm.baseNote + 1 
     elseif option == "steps" then
-        table.insert(vm.steps, vmRandomStep()) 
+        table.insert(vm.steps, vmRandomStep())
+    elseif option == "volume" then
+        vmChangeVolume(vm, 0.05)
     end
 end
 
@@ -33,6 +37,8 @@ local function editParamDec(vm, option)
         vm.baseNote = vm.baseNote - 1 
     elseif option == "steps" then
         table.remove(vm.steps) 
+    elseif option == "volume" then
+        vmChangeVolume(vm, -0.05)
     end
 end
 

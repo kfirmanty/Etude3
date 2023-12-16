@@ -1,5 +1,4 @@
 import "CoreLibs/timer"
-import "audio"
 import "vm"
 import "views/tracks"
 import "views/trackparams"
@@ -7,13 +6,10 @@ import "views/menu"
 
 local gfx = playdate.graphics
 --local synths = {druminst(), newinst(2), newinst(2), newinst(2), newinst(2)}
-local vms = {vmInit({baseNote = 36, voice = newinst(2)}), 
-			 vmInit({baseNote = 36, voice = newinst(2)}), 
-			 vmInit({baseNote = 36, voice = newinst(2)}), 
-			 vmInit({baseNote = 36, voice = newinst(2)})}
-
-local tickMs = 150
-local keyTimer = nil
+local vms = {vmInit({baseNote = 24, voice = {waveform = "sawtooth", volume = 0.4, polyphony = 2}}), 
+			 vmInit({baseNote = 36, voice = {waveform = "sawtooth", volume = 0.4, polyphony = 2}}), 
+			 vmInit({baseNote = 36, voice = {waveform = "triangle", volume = 0.5, polyphony = 2}}), 
+			 vmInit({baseNote = 48, voice = {waveform = "triangle", volume = 0.5, polyphony = 2}})}
 
 currentView = "tracks"
 
@@ -23,8 +19,9 @@ local function sequenceTick()
 		vmTick(vm)
 	end
 end
-keyTimer = playdate.timer.keyRepeatTimerWithDelay(tickMs, tickMs, sequenceTick)
---    keyTimer:remove()
+
+playbackFn = sequenceTick
+startPlayback(playbackFn)
 
 -- INPUT
 local viewToImpl = {tracks = TracksView, 

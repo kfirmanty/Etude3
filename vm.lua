@@ -1,4 +1,6 @@
 import "utils"
+import "audio"
+
 -- i - increase note
 -- d = decrease note
 -- a = random note
@@ -70,7 +72,7 @@ function vmTick(vm)
     end
     vm.tick = vm.tick + 1
     if hasAct then
-        vm.voice:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
+        vm.synth:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
     end
     return hasAct
 end
@@ -87,9 +89,20 @@ local function randomSteps(num)
     return steps
 end
 
+function vmChangeVoiceWave(vm, waveformName)
+    
+end
+
+
+function vmChangeVolume(vm, volumeChange)
+    vm.voice.volume = vm.voice.volume + volumeChange
+    synthChangeVolume(vm.synth, vm.voice.volume)
+end
+
 function vmInit(settings)
     return {note = 0, baseNote = settings.baseNote, 
     step = 0, steps = randomSteps(4), 
     scale = "minorPentatonic", ticksPerStep = 4, tick = 0,
-    voice = settings.voice}
+    voice = settings.voice,
+    synth = newinst(settings.voice)}
 end

@@ -3,7 +3,23 @@ MenuView = {}
 local gfx = playdate.graphics
 
 local menuPosition = 1
-local options = {"tracks", "params"}
+local options = {"playback", "tracks", "params"}
+
+local tickMs = 150
+local keyTimer = nil
+local playback = true
+
+function startPlayback(fn)
+	playback = true
+	keyTimer = playdate.timer.keyRepeatTimerWithDelay(tickMs, tickMs, fn)
+end
+
+playbackFn = nil
+
+function stopPlayback()
+	playback = false
+	keyTimer:remove()
+end
 
 function MenuView.leftButtonDown(vms) 
 
@@ -23,7 +39,16 @@ function MenuView.downButtonDown(vms)
 end
 
 function MenuView.AButtonDown(vms) 
-    currentView = options[menuPosition]
+    if(options[menuPosition] == "playback") then
+        if playback then
+            playback = false
+            stopPlayback()
+        else
+            startPlayback(playbackFn)
+        end
+    else 
+        currentView = options[menuPosition]
+    end
 end
 
 function MenuView.BButtonDown(vms) 
@@ -36,6 +61,9 @@ function MenuView.update(vms)
     playdate.graphics.drawText("MENU", 20, 10)
 	for i,option in ipairs(options) do
         local text = option
+        if option == "playback" then
+            text = option .. ": " .. (playback and "on" or "off")
+        end
 		if i == menuPosition then 
 		    text = "*" .. text .. "*"
         end
