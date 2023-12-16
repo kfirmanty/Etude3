@@ -58,7 +58,7 @@ end
 function MenuView.update(vms)
 	gfx.clear(gfx.kColorWhite)
 	gfx.setColor(gfx.kColorBlack)
-    playdate.graphics.drawText("MENU", 20, 10)
+    gfx.drawText("MENU", 20, 10)
 	for i,option in ipairs(options) do
         local text = option
         if option == "playback" then
@@ -67,6 +67,6 @@ function MenuView.update(vms)
 		if i == menuPosition then 
 		    text = "*" .. text .. "*"
         end
-        playdate.graphics.drawText(text, 20, 20 + i * 40)
+        gfx.drawText(text, 20, 20 + i * 30)
 	end
 end

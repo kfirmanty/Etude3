@@ -53,11 +53,27 @@ end
 local actions = {i = inc, d = dec, a = randomNote, j = jumpToRandomStep, f = faster, s = slower}
 local scales = {minorPentatonic = {0, 3, 5, 7, 10}}
 
+local baseNotes = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
+
+function vmBaseNote(vm)
+    return baseNotes[vm.baseNote + 1]
+end
+
+function vmChangeBaseNote(vm, dir)
+    local newBaseNote = vm.baseNote + dir
+    if newBaseNote < 0 then
+        newBaseNote = #baseNotes - 1
+    elseif newBaseNote >= #baseNotes then
+        newBaseNote = 0
+    end
+    vm.baseNote = newBaseNote
+end
+
 function vmToMidiNote(vm)
     local scale = scales[vm.scale]
     local octave = math.floor(vm.note / #scale)
     local scaleStep = vm.note % #scale
-    return vm.baseNote + (octave * 12) + scale[scaleStep + 1]
+    return vm.baseNote + (vm.octave * 12) + (octave * 12) + scale[scaleStep + 1]
 end
 
 function vmTick(vm)
@@ -115,9 +131,9 @@ function vmChangeVolume(vm, volumeChange)
 end
 
 function vmInit(settings)
-    return {note = 0, baseNote = settings.baseNote, 
-    step = 0, steps = randomSteps(4), 
-    scale = "minorPentatonic", ticksPerStep = 4, tick = 0,
-    voice = settings.voice,
-    synth = newinst(settings.voice)}
+    return {note = 0, baseNote = settings.baseNote, octave = settings.octave,
+            step = 0, steps = randomSteps(4), 
+            scale = "minorPentatonic", ticksPerStep = 4, tick = 0,
+            voice = settings.voice,
+            synth = newinst(settings.voice)}
 end

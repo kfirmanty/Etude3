@@ -65,7 +65,7 @@ end
 function TracksView.update(vms)
 	gfx.clear(gfx.kColorWhite)
 	gfx.setColor(gfx.kColorBlack)
-    playdate.graphics.drawText("TRACKS", 20, 10)
+    gfx.drawText("TRACKS", 20, 10)
 	for vmI=1,#vms do
 		local vm = vms[vmI]
 		local text = ""
@@ -78,7 +78,6 @@ function TracksView.update(vms)
 				text = text .. v .. "   "
 			end
 		end
-		playdate.graphics.drawRect(15, 15 + vmI * 40, #text * 8, 32)
-		playdate.graphics.drawText(text, 20, 20 + vmI * 40)
+		gfx.drawText(text, 20, 20 + vmI * 30)
 	end
 end
