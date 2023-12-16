@@ -9,14 +9,17 @@ phase = snd.kWavePOPhase,
 digital = snd.kWavePODigital,
 vosim = snd.kWavePOVosim}
 
-possibleWaveforms = {"sine", "square", "sawtooth", "triange", "noise", "phase", "digital", "vosim"}
+possibleWaveforms = {"sine", "square", "sawtooth", "triangle", "noise", "phase", "digital", "vosim"}
 
 function synthChangeWaveform(synth, waveName)
-	synth:setWaveform(waveforms[waveName])
+	print("wave:" .. waveName)
+	for i=1,#synth.synths do
+		synth.synths[i]:setWaveform(waveforms[waveName])
+	end
 end
 
 function synthChangeVolume(synth, volume)
-	synth:setVolume(volume)
+	synth.instrument:setVolume(volume)
 end
 
 function newsynth(settings)
@@ -38,11 +41,14 @@ end
 
 function newinst(settings)
 	local inst = snd.instrument.new()
+	local synths = {}
 	for i=1,settings.polyphony do
-		inst:addVoice(newsynth(settings))
+		local synth = newsynth(settings)
+		inst:addVoice(synth)
+		synths[i] = synth
 	end
 	inst:setVolume(settings.volume)
-	return inst
+	return {instrument = inst, synths = synths}
 end
 
 function druminst()

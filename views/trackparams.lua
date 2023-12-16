@@ -30,6 +30,8 @@ local function editParamInc(vm, option)
         table.insert(vm.steps, vmRandomStep())
     elseif option == "volume" then
         vmChangeVolume(vm, 0.05)
+    elseif option == "waveform" then
+        vmChangeVoiceWave(vm, 1)
     end
 end
 
@@ -40,6 +42,8 @@ local function editParamDec(vm, option)
         table.remove(vm.steps) 
     elseif option == "volume" then
         vmChangeVolume(vm, -0.05)
+    elseif option == "waveform" then
+        vmChangeVoiceWave(vm, -1)
     end
 end
 

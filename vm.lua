@@ -72,7 +72,7 @@ function vmTick(vm)
     end
     vm.tick = vm.tick + 1
     if hasAct then
-        vm.synth:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
+        vm.synth.instrument:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
     end
     return hasAct
 end
@@ -89,8 +89,23 @@ local function randomSteps(num)
     return steps
 end
 
-function vmChangeVoiceWave(vm, waveformName)
-    
+function vmChangeVoiceWave(vm, dir)
+    local currentWaveformIndex = 1
+    local currentWaveform = vm.voice.waveform
+    for i,waveform in ipairs(possibleWaveforms) do
+        if waveform == currentWaveform then
+            currentWaveformIndex = i
+        end
+    end
+    currentWaveformIndex = currentWaveformIndex + dir
+    if currentWaveformIndex < 1 then
+        currentWaveformIndex = #possibleWaveforms
+    elseif currentWaveformIndex > #possibleWaveforms then
+        currentWaveformIndex = 1
+    end
+    local waveformName = possibleWaveforms[currentWaveformIndex]
+    synthChangeWaveform(vm.synth, waveformName)
+    vm.voice.waveform = waveformName
 end
 
 
