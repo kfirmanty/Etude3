@@ -102,6 +102,12 @@ function vmToMidiNote(vm)
     return vm.baseNote + (vm.octave * 12) + (octave * 12) + scale[scaleStep + 1]
 end
 
+function vmToDisplayNote(vm)
+    local midiNote = vmToMidiNote(vm)
+    local note = midiNote % 12
+    return baseNotes[note + 1]
+end
+
 function vmTick(vm)
     local hasAct = false
     if vm.tick % vm.ticksPerStep == 0 then

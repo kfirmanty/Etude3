@@ -79,5 +79,7 @@ function TracksView.update(vms)
 			end
 		end
 		gfx.drawText(text, 20, 20 + vmI * 30)
+
+		gfx.drawText(vmToDisplayNote(vm) .. "   ", 0 + vmI * 20, 220)
 	end
 end
