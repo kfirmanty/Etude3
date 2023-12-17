@@ -7,7 +7,7 @@ local gfx = playdate.graphics
 local editPosition = 1
 local selectedTrack = 1
 
-local options = {"base note", "octave", "steps", "volume", "waveform"}
+local options = {"base note", "octave", "steps", "volume", "waveform", "explicit trigger"}
 
 local function optionToVmParamValue(vm, option)
     local value = nil
@@ -21,6 +21,8 @@ local function optionToVmParamValue(vm, option)
     value = vm.voice.volume
   elseif option == "waveform" then
     value = vm.voice.waveform
+  elseif option == "explicit trigger" then
+    value = vm.explicitTrigger and "on" or "off"
   end
   return value
 end
@@ -36,6 +38,8 @@ local function editParamInc(vm, option)
         vmChangeVolume(vm, 0.05)
     elseif option == "waveform" then
         vmChangeVoiceWave(vm, 1)
+    elseif option == "explicit trigger" then
+        vm.explicitTrigger = not vm.explicitTrigger
     end
 end
 
@@ -50,6 +54,8 @@ local function editParamDec(vm, option)
         vmChangeVolume(vm, -0.05)
     elseif option == "waveform" then
         vmChangeVoiceWave(vm, -1)
+    elseif option == "explicit trigger" then
+        vm.explicitTrigger = not vm.explicitTrigger
     end
 end
 

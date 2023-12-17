@@ -7,6 +7,7 @@ import "audio"
 -- f = faster
 -- s = slower
 -- j = jump to random step
+-- t = trigger
 
 -- l = shift left
 -- r =  shift right
@@ -19,7 +20,7 @@ import "audio"
 -- two modes = play on each tick, or use explicit play
 -- allow to set how many steps to execute at once
 
-possibleActions = {"i", "d", "a", "j", "f", "s"}
+possibleActions = {"t", "i", "d", "a", "j", "f", "s"}
 
 local topScaleSteps = 10
 local function inc(vm)
@@ -50,7 +51,13 @@ local function slower(vm)
     if vm.ticksPerStep > 8 then vm.ticksPerStep = 8 end
 end
 
-local actions = {i = inc, d = dec, a = randomNote, j = jumpToRandomStep, f = faster, s = slower}
+local function trigger(vm)
+    if vm.explicitTrigger then
+        vm.synth.instrument:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
+    end
+end
+
+local actions = {t = trigger, i = inc, d = dec, a = randomNote, j = jumpToRandomStep, f = faster, s = slower}
 local scales = {minorPentatonic = {0, 3, 5, 7, 10}}
 
 local baseNotes = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
@@ -87,7 +94,7 @@ function vmTick(vm)
         if vm.step >= #vm.steps then vm.step = 0 end
     end
     vm.tick = vm.tick + 1
-    if hasAct then
+    if hasAct and (not vm.explicitTrigger) then
         vm.synth.instrument:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
     end
     return hasAct
@@ -101,6 +108,9 @@ local function randomSteps(num)
     local steps = {}
     for i = 1,num do
         steps[i] = vmRandomStep()
+    end
+    if vm.explicitTrigger then
+        steps[1] = "t"
     end
     return steps
 end
@@ -135,5 +145,6 @@ function vmInit(settings)
             step = 0, steps = randomSteps(4), 
             scale = "minorPentatonic", ticksPerStep = 4, tick = 0,
             voice = settings.voice,
-            synth = newinst(settings.voice)}
+            synth = newinst(settings.voice),
+            explicitTrigger = true}
 end
