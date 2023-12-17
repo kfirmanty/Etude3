@@ -7,20 +7,31 @@ import "audio"
 -- f = faster
 -- s = slower
 -- j = jump to random step
--- t = trigger
+-- t = trigger note
+-- n = nop
+-- c = chaos - change random operator at random position
 
 -- l = shift left
 -- r =  shift right
--- n = nop
--- c = chaos - change random operator at random position
--- p = explicit play note
 
--- t = trigger tracks that depend on the current one
 -- m = mute or unmute track
 -- two modes = play on each tick, or use explicit play
 -- allow to set how many steps to execute at once
 
-possibleActions = {"t", "i", "d", "a", "j", "f", "s"}
+possibleActions = {"t", "i", "d", "a", "j", "f", "s", "c"}
+
+function vmRandomStep()
+    return possibleActions[randInt(#possibleActions)+1]
+end
+
+local function randomSteps(num)
+    local steps = {}
+    for i = 1,num do
+        steps[i] = vmRandomStep()
+    end
+    steps[1] = "t"
+    return steps
+end
 
 local topScaleSteps = 10
 local function inc(vm)
@@ -57,7 +68,15 @@ local function trigger(vm)
     end
 end
 
-local actions = {t = trigger, i = inc, d = dec, a = randomNote, j = jumpToRandomStep, f = faster, s = slower}
+local function nop(vm)
+end
+
+local function chaos(vm)
+    local steps = vm.steps
+    steps[randInt(#steps)+1] = vmRandomStep()
+end
+
+local actions = {t = trigger, i = inc, d = dec, a = randomNote, j = jumpToRandomStep, f = faster, s = slower, n = nop, c = chaos}
 local scales = {minorPentatonic = {0, 3, 5, 7, 10}}
 
 local baseNotes = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
@@ -98,21 +117,6 @@ function vmTick(vm)
         vm.synth.instrument:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
     end
     return hasAct
-end
-
-function vmRandomStep()
-    return possibleActions[randInt(#possibleActions)+1]
-end
-
-local function randomSteps(num)
-    local steps = {}
-    for i = 1,num do
-        steps[i] = vmRandomStep()
-    end
-    if vm.explicitTrigger then
-        steps[1] = "t"
-    end
-    return steps
 end
 
 function vmChangeVoiceWave(vm, dir)
