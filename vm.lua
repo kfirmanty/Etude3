@@ -18,7 +18,7 @@ import "audio"
 -- two modes = play on each tick, or use explicit play
 -- allow to set how many steps to execute at once
 
-possibleActions = {"t", "i", "d", "a", "j", "f", "s", "c"}
+possibleActions = {"t", "i", "d", "a", "j", "f", "s", "c", "n"}
 
 function vmRandomStep()
     return possibleActions[randInt(#possibleActions)+1]

@@ -8,8 +8,8 @@ local gfx = playdate.graphics
 --local synths = {druminst(), newinst(2), newinst(2), newinst(2), newinst(2)}
 local vms = {vmInit({baseNote = 0, octave = 2, voice = {waveform = "sawtooth", volume = 0.4, polyphony = 2}}), 
 			 vmInit({baseNote = 0, octave = 3, voice = {waveform = "sawtooth", volume = 0.4, polyphony = 2}}), 
-			 vmInit({baseNote = 0, octave = 3, voice = {waveform = "triangle", volume = 0.5, polyphony = 2}}), 
-			 vmInit({baseNote = 0, octave = 4, voice = {waveform = "triangle", volume = 0.5, polyphony = 2}})}
+			 vmInit({baseNote = 0, octave = 3, voice = {waveform = "phase", volume = 0.4, polyphony = 2}}), 
+			 vmInit({baseNote = 0, octave = 4, voice = {waveform = "vosim", volume = 0.5, polyphony = 2}})}
 
 currentView = "tracks"
 
