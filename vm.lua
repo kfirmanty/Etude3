@@ -21,12 +21,12 @@ import "audio"
 possibleActions = {"t", "i", "d", "a", "j", "f", "s", "c", "n"}
 
 function vmRandomStep()
-    return possibleActions[randInt(#possibleActions)+1]
+    return possibleActions[randInt(#possibleActions) + 1]
 end
 
 local function randomSteps(num)
     local steps = {}
-    for i = 1,num do
+    for i = 1, num do
         steps[i] = vmRandomStep()
     end
     steps[1] = "t"
@@ -36,12 +36,16 @@ end
 local topScaleSteps = 10
 local function inc(vm)
     vm.note = vm.note + 1
-    if vm.note > topScaleSteps then vm.note = topScaleSteps end
+    if vm.note > topScaleSteps then
+        vm.note = topScaleSteps
+    end
 end
 
 local function dec(vm)
     vm.note = vm.note - 1
-    if vm.note < 0 then vm.note = 0 end
+    if vm.note < 0 then
+        vm.note = 0
+    end
 end
 
 local function randomNote(vm)
@@ -54,12 +58,16 @@ end
 
 local function faster(vm)
     vm.ticksPerStep = vm.ticksPerStep - 1
-    if vm.ticksPerStep < 1 then vm.ticksPerStep = 1 end
+    if vm.ticksPerStep < 1 then
+        vm.ticksPerStep = 1
+    end
 end
 
 local function slower(vm)
     vm.ticksPerStep = vm.ticksPerStep + 1
-    if vm.ticksPerStep > 8 then vm.ticksPerStep = 8 end
+    if vm.ticksPerStep > 8 then
+        vm.ticksPerStep = 8
+    end
 end
 
 local function trigger(vm)
@@ -74,10 +82,20 @@ end
 
 local function chaos(vm)
     local steps = vm.steps
-    steps[randInt(#steps)+1] = vmRandomStep()
+    steps[randInt(#steps) + 1] = vmRandomStep()
 end
 
-local actions = {t = trigger, i = inc, d = dec, a = randomNote, j = jumpToRandomStep, f = faster, s = slower, n = nop, c = chaos}
+local actions = {
+    t = trigger,
+    i = inc,
+    d = dec,
+    a = randomNote,
+    j = jumpToRandomStep,
+    f = faster,
+    s = slower,
+    n = nop,
+    c = chaos
+}
 local scales = {minorPentatonic = {0, 3, 5, 7, 10}}
 
 local baseNotes = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
@@ -118,7 +136,9 @@ function vmTick(vm)
         local action = vm.steps[vm.step + 1]
         actions[action](vm)
         vm.step = vm.step + 1
-        if vm.step >= #vm.steps then vm.step = 0 end
+        if vm.step >= #vm.steps then
+            vm.step = 0
+        end
     end
     vm.tick = vm.tick + 1
     if hasAct and (not vm.explicitTrigger) then
@@ -131,7 +151,7 @@ end
 function vmChangeVoiceWave(vm, dir)
     local currentWaveformIndex = 1
     local currentWaveform = vm.voice.waveform
-    for i,waveform in ipairs(possibleWaveforms) do
+    for i, waveform in ipairs(possibleWaveforms) do
         if waveform == currentWaveform then
             currentWaveformIndex = i
         end
@@ -147,18 +167,24 @@ function vmChangeVoiceWave(vm, dir)
     vm.voice.waveform = waveformName
 end
 
-
 function vmChangeVolume(vm, volumeChange)
     vm.voice.volume = vm.voice.volume + volumeChange
     synthChangeVolume(vm.synth, vm.voice.volume)
 end
 
 function vmInit(settings)
-    return {note = 0, baseNote = settings.baseNote, octave = settings.octave,
-            step = 0, steps = randomSteps(4), 
-            scale = "minorPentatonic", ticksPerStep = 4, tick = 0,
-            voice = settings.voice,
-            synth = newinst(settings.voice),
-            explicitTrigger = true,
-            playedNote = false}
+    return {
+        note = 0,
+        baseNote = settings.baseNote,
+        octave = settings.octave,
+        step = 0,
+        steps = randomSteps(4),
+        scale = "minorPentatonic",
+        ticksPerStep = 4,
+        tick = 0,
+        voice = settings.voice,
+        synth = newinst(settings.voice),
+        explicitTrigger = true,
+        playedNote = false
+    }
 end
