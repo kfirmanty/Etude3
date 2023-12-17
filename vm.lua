@@ -65,6 +65,7 @@ end
 local function trigger(vm)
     if vm.explicitTrigger then
         vm.synth.instrument:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
+        vm.playedNote = true
     end
 end
 
@@ -109,6 +110,7 @@ function vmToDisplayNote(vm)
 end
 
 function vmTick(vm)
+    vm.playedNote = false
     local hasAct = false
     if vm.tick % vm.ticksPerStep == 0 then
         hasAct = true
@@ -121,6 +123,7 @@ function vmTick(vm)
     vm.tick = vm.tick + 1
     if hasAct and (not vm.explicitTrigger) then
         vm.synth.instrument:playMIDINote(vmToMidiNote(vm), 0.5, 0.1)
+        vm.playedNote = true
     end
     return hasAct
 end
@@ -156,5 +159,6 @@ function vmInit(settings)
             scale = "minorPentatonic", ticksPerStep = 4, tick = 0,
             voice = settings.voice,
             synth = newinst(settings.voice),
-            explicitTrigger = true}
+            explicitTrigger = true,
+            playedNote = false}
 end
